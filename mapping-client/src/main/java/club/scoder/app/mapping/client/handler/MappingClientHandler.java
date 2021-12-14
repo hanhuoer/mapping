@@ -81,6 +81,13 @@ public class MappingClientHandler extends SimpleChannelInboundHandler<Message> {
      *                   MappingChannel
      * </pre>
      *
+     * <pre>
+     *     Send the message to real server
+     * +---------------+  >>>>>>>>>>>>>>>>  +------------+
+     * | MappingClient |        data        | RealServer |
+     * +---------------+  >>>>>>>>>>>>>>>>  +------------+
+     * </pre>
+     *
      * @param ctx mapping channel
      * @param msg message from mapping channel(user channel)
      */
