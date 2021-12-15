@@ -11,6 +11,7 @@
     <name>Mapping</name>
     <modules>
         <module>mapping-common</module>
+        <module>mapping-server</module>
         <module>mapping-client</module>
     </modules>
 
