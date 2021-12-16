@@ -24,5 +24,12 @@ public class ChannelManager {
      * value: proxy channel
      */
     public static Map<String, Channel> clientIdChannelMap = Maps.newHashMap();
+    /**
+     * 用户向代理端口发送请求的缓存
+     * <p>
+     * key: channel id
+     * value: channel
+     */
+    public static Map<String, Channel> userChannelMap = Maps.newHashMap();
 
 }

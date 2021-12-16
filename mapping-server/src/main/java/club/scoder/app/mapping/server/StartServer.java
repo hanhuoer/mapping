@@ -2,6 +2,7 @@ package club.scoder.app.mapping.server;
 
 import club.scoder.app.mapping.server.context.ServerContext;
 import club.scoder.app.mapping.server.proxy.MappingServer;
+import club.scoder.app.mapping.server.proxy.UserServer;
 
 public class StartServer {
 
@@ -9,6 +10,8 @@ public class StartServer {
         ServerContext serverContext = ServerContext.instance();
         MappingServer mappingServer = new MappingServer(serverContext);
         mappingServer.start();
+        UserServer userServer = new UserServer(serverContext);
+        userServer.start();
     }
 
 }
