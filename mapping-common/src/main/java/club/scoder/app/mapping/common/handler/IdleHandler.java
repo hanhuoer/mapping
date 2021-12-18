@@ -10,6 +10,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class IdleHandler extends IdleStateHandler {
 
+    private static final int READER_IDLE_TIME_SECONDS = 60;
+    private static final int WRITER_IDLE_TIME_SECONDS = 40;
+    private static final int ALL_IDLE_TIME_SECONDS = 0;
+
+
+    public IdleHandler() {
+        this(READER_IDLE_TIME_SECONDS, WRITER_IDLE_TIME_SECONDS, ALL_IDLE_TIME_SECONDS);
+    }
+
     public IdleHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds) {
         super(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds);
     }

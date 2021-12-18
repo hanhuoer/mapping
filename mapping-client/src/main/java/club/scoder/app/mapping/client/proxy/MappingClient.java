@@ -4,6 +4,7 @@ import club.scoder.app.mapping.client.context.ClientConfiguration;
 import club.scoder.app.mapping.client.context.ClientContext;
 import club.scoder.app.mapping.client.handler.MappingClientHandler;
 import club.scoder.app.mapping.common.Server;
+import club.scoder.app.mapping.common.handler.IdleHandler;
 import club.scoder.app.mapping.common.protocol.Message;
 import club.scoder.app.mapping.common.protocol.MessageDecoder;
 import club.scoder.app.mapping.common.protocol.MessageEncoder;
@@ -41,6 +42,7 @@ public class MappingClient implements Server {
             protected void initChannel(SocketChannel ch) throws Exception {
                 ch.pipeline().addLast(new MessageDecoder());
                 ch.pipeline().addLast(new MessageEncoder());
+                ch.pipeline().addLast(new IdleHandler(60, 30, 0));
                 ch.pipeline().addLast(new MappingClientHandler());
             }
         });
