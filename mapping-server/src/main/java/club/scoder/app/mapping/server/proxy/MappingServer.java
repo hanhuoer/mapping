@@ -1,11 +1,11 @@
 package club.scoder.app.mapping.server.proxy;
 
 import club.scoder.app.mapping.common.Server;
-import club.scoder.app.mapping.common.handler.IdleHandler;
 import club.scoder.app.mapping.common.protocol.MessageDecoder;
 import club.scoder.app.mapping.common.protocol.MessageEncoder;
 import club.scoder.app.mapping.server.context.ServerConfiguration;
 import club.scoder.app.mapping.server.context.ServerContext;
+import club.scoder.app.mapping.server.handler.IdleServerHandler;
 import club.scoder.app.mapping.server.handler.MappingServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -47,7 +47,7 @@ public class MappingServer implements Server {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(new MessageDecoder())
                                 .addLast(new MessageEncoder())
-                                .addLast(new IdleHandler())
+                                .addLast(new IdleServerHandler())
                                 .addLast(new MappingServerHandler());
                     }
                 });
