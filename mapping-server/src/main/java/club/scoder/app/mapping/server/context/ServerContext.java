@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -171,4 +172,16 @@ public class ServerContext implements Context {
     public List<Integer> getProxyPortList() {
         return proxyPortList;
     }
+
+    public boolean auth(String clientId) {
+        if (StringUtil.isNullOrEmpty(clientId))
+            return false;
+        for (Client client : clientList) {
+            if (clientId.contains(client.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

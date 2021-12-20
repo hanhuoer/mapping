@@ -3,6 +3,7 @@ package club.scoder.app.mapping.server.handler;
 import club.scoder.app.mapping.common.protocol.Message;
 import club.scoder.app.mapping.common.protocol.MessageType;
 import club.scoder.app.mapping.server.context.ChannelManager;
+import club.scoder.app.mapping.server.context.ServerContext;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,6 +14,13 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class MappingServerHandler extends SimpleChannelInboundHandler<Message> {
+
+    private final ServerContext serverContext;
+
+
+    public MappingServerHandler() {
+        serverContext = ServerContext.instance();
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -111,9 +119,14 @@ public class MappingServerHandler extends SimpleChannelInboundHandler<Message> {
     private void handlerRegister(ChannelHandlerContext ctx, Message message) {
         String clientId = new String(message.getClientId(), StandardCharsets.UTF_8);
         String channelId = getChannelId(ctx);
-        if (ChannelManager.clientIdChannelMap.containsKey(clientId) || ChannelManager.channelIdClientIdMap.containsKey(channelId)) {
+        if (!serverContext.auth(clientId)) {
             Message msg = new Message();
             msg.setType(MessageType.REGISTER_FAILURE);
+            ctx.writeAndFlush(msg);
+            log.warn("client id: {} client is not exist.", clientId);
+        } else if (ChannelManager.clientIdChannelMap.containsKey(clientId) || ChannelManager.channelIdClientIdMap.containsKey(channelId)) {
+            Message msg = new Message();
+            msg.setType(MessageType.REGISTER_REPEAT);
             ctx.writeAndFlush(msg);
             log.warn("client id: {} has been registered, please don't repeat the operate.", clientId);
         } else {

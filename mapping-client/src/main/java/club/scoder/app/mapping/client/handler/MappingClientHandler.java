@@ -54,6 +54,9 @@ public class MappingClientHandler extends SimpleChannelInboundHandler<Message> {
             case MessageType.REGISTER_FAILURE:
                 handlerRegisterFailure(ctx, msg);
                 break;
+            case MessageType.REGISTER_REPEAT:
+                handlerRegisterRepeat(ctx, msg);
+                break;
             case MessageType.DISCONNECTION:
                 handlerDisconnection(ctx, msg);
                 break;
@@ -141,6 +144,17 @@ public class MappingClientHandler extends SimpleChannelInboundHandler<Message> {
             ChannelManager.REAL_SERVER_CHANNEL_MAP.remove(userChannelId);
         }
         log.info("user channel disconnected, and now close real service channel.");
+    }
+
+    /**
+     * current client id has been used by someone else.
+     *
+     * @param ctx mapping channel
+     * @param msg message from server
+     */
+    private void handlerRegisterRepeat(ChannelHandlerContext ctx, Message msg) {
+        log.info("current client id has been used by someone else.");
+        ctx.close();
     }
 
     /**
