@@ -4,6 +4,7 @@ import club.scoder.app.mapping.client.context.ClientConfiguration;
 import club.scoder.app.mapping.client.context.ClientContext;
 import club.scoder.app.mapping.client.handler.IdleClientHandler;
 import club.scoder.app.mapping.client.handler.MappingClientHandler;
+import club.scoder.app.mapping.common.Retry;
 import club.scoder.app.mapping.common.Server;
 import club.scoder.app.mapping.common.protocol.Message;
 import club.scoder.app.mapping.common.protocol.MessageDecoder;
@@ -17,6 +18,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class MappingClient implements Server {
@@ -26,6 +28,7 @@ public class MappingClient implements Server {
     private final int serverPort;
     private final Bootstrap bootstrap;
     private final EventLoopGroup workGroup;
+    private final Retry retry;
 
 
     public MappingClient(ClientContext clientContext) {
@@ -36,6 +39,7 @@ public class MappingClient implements Server {
 
         bootstrap = new Bootstrap();
         workGroup = new NioEventLoopGroup();
+        retry = new Retry();
 
         bootstrap.group(workGroup).channel(NioSocketChannel.class).option(ChannelOption.SO_KEEPALIVE, true).handler(new ChannelInitializer<SocketChannel>() {
             @Override
@@ -50,6 +54,30 @@ public class MappingClient implements Server {
 
     @Override
     public void start() {
+        connect();
+    }
+
+    @Override
+    public void stop() {
+        workGroup.shutdownGracefully();
+    }
+
+    private void reconnect() {
+        long ms = retry.waitMilliseconds();
+        try {
+            if (ms > 0) {
+                log.info("[reconnect] retries: {}, wait ms: {}", retry.getRetries(), ms);
+                TimeUnit.MILLISECONDS.sleep(ms);
+                connect();
+            } else {
+                log.warn("[reconnect] retries exceeded.");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void connect() {
         bootstrap.connect(serverHost, serverPort).addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture channelFuture) throws Exception {
@@ -61,14 +89,10 @@ public class MappingClient implements Server {
                     channelFuture.channel().writeAndFlush(msg);
                 } else {
                     log.info("client: {} connection failed.", clientId);
+                    reconnect();
                 }
             }
         });
-    }
-
-    @Override
-    public void stop() {
-        workGroup.shutdownGracefully();
     }
 
 }
