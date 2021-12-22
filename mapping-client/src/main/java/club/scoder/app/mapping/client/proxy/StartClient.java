@@ -1,11 +1,14 @@
-package club.scoder.app.mapping.client;
+package club.scoder.app.mapping.client.proxy;
 
 import club.scoder.app.mapping.client.context.ClientContext;
-import club.scoder.app.mapping.client.proxy.MappingClient;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
 
-public class StartClient {
+@Component
+public class StartClient implements InitializingBean {
 
-    public static void main(String[] args) {
+    @Override
+    public void afterPropertiesSet() throws Exception {
         ClientContext clientContext = ClientContext.instance();
         MappingClient mappingClient = new MappingClient(clientContext);
         mappingClient.start();
