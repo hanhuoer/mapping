@@ -1,12 +1,14 @@
-package club.scoder.app.mapping.server;
+package club.scoder.app.mapping.server.proxy;
 
 import club.scoder.app.mapping.server.context.ServerContext;
-import club.scoder.app.mapping.server.proxy.MappingServer;
-import club.scoder.app.mapping.server.proxy.UserServer;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
 
-public class StartServer {
+@Component
+public class StartServer implements InitializingBean {
 
-    public static void main(String[] args) {
+    @Override
+    public void afterPropertiesSet() throws Exception {
         ServerContext serverContext = ServerContext.instance();
         MappingServer mappingServer = new MappingServer(serverContext);
         mappingServer.start();
