@@ -9,10 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>club.scoder.app</groupId>
     <artifactId>mapping-common</artifactId>
+    <packaging>jar</packaging>
     <version>${revision}</version>
-    <name>Mapping Common</name>
+    <name>Mapping Common ${project.version}</name>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -58,8 +58,6 @@
             <artifactId>spring-boot-starter</artifactId>
             <version>2.6.1</version>
         </dependency>
-
-
     </dependencies>
 
 </project>

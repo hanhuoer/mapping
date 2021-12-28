@@ -12,27 +12,50 @@
     <artifactId>mapping</artifactId>
     <packaging>pom</packaging>
     <version>${revision}</version>
-    <name>Mapping</name>
+    <name>Mapping ${project.version}</name>
     <modules>
         <module>mapping-common</module>
         <module>mapping-server</module>
         <module>mapping-client</module>
+        <module>build-server</module>
+        <module>build-client</module>
     </modules>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <revision>1.0</revision>
+        <maven-assembly-plugin.version>3.0.0</maven-assembly-plugin.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>club.scoder.app</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>mapping-common</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>mapping-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>mapping-client</artifactId>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven-assembly-plugin.version}</version>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
