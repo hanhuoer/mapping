@@ -1,9 +1,15 @@
 package club.scoder.app.mapping.client.context;
 
+import io.netty.util.internal.StringUtil;
 import lombok.Data;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
+@ConfigurationProperties(prefix = "mapping")
 @Data
-public class ClientConfiguration {
+public class ClientConfiguration implements InitializingBean {
 
     private static volatile ClientConfiguration INSTANCE = null;
 
@@ -12,18 +18,17 @@ public class ClientConfiguration {
     private Integer serverPort;
 
 
-    private ClientConfiguration() {
-    }
-
-    protected static ClientConfiguration instance() {
-        if (INSTANCE == null) {
-            synchronized (ClientConfiguration.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new ClientConfiguration();
-                }
-            }
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (StringUtil.isNullOrEmpty(clientId)) {
+            throw new RuntimeException("client id can not be null, please check conf.");
         }
-        return INSTANCE;
+        if (StringUtil.isNullOrEmpty(serverHost)) {
+            throw new RuntimeException("server host can not be null, please check conf.");
+        }
+        if (serverPort == null) {
+            throw new RuntimeException("server port can not be null, please check conf.");
+        }
     }
 
 }
