@@ -18,8 +18,8 @@ public class MappingServerHandler extends SimpleChannelInboundHandler<Message> {
     private final ServerContext serverContext;
 
 
-    public MappingServerHandler() {
-        serverContext = ServerContext.instance();
+    public MappingServerHandler(ServerContext serverContext) {
+        this.serverContext = serverContext;
     }
 
     @Override

@@ -20,8 +20,8 @@ public class UserChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final ServerContext serverContext;
 
 
-    public UserChannelHandler() {
-        serverContext = ServerContext.instance();
+    public UserChannelHandler(ServerContext serverContext) {
+        this.serverContext = serverContext;
     }
 
     @Override

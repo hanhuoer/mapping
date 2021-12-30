@@ -26,9 +26,11 @@ public class MappingServer implements Server {
     private final EventLoopGroup WORK_GROUP;
     private final String hostname;
     private final int port;
+    private final ServerContext serverContext;
 
 
     public MappingServer(ServerContext serverContext) {
+        this.serverContext = serverContext;
         ServerConfiguration configuration = serverContext.getConfiguration();
         hostname = configuration.getServerHost();
         port = configuration.getServerPort();
@@ -48,7 +50,7 @@ public class MappingServer implements Server {
                         pipeline.addLast(new MessageDecoder())
                                 .addLast(new MessageEncoder())
                                 .addLast(new IdleServerHandler())
-                                .addLast(new MappingServerHandler());
+                                .addLast(new MappingServerHandler(serverContext));
                     }
                 });
         ChannelFuture channelFuture = null;

@@ -19,9 +19,11 @@ public class UserServer implements Server {
     private final EventLoopGroup BOSS_GROUP;
     private final EventLoopGroup WORK_GROUP;
     private final List<Integer> proxyPortList;
+    private final ServerContext serverContext;
 
 
     public UserServer(ServerContext serverContext) {
+        this.serverContext = serverContext;
         proxyPortList = serverContext.getProxyPortList();
         BOSS_GROUP = new NioEventLoopGroup(1);
         WORK_GROUP = new NioEventLoopGroup(32);
@@ -35,7 +37,7 @@ public class UserServer implements Server {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new UserChannelHandler());
+                        ch.pipeline().addLast(new UserChannelHandler(serverContext));
                     }
                 });
         for (Integer port : proxyPortList) {

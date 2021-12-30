@@ -6,7 +6,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.netty.util.internal.StringUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,23 +18,22 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
+import java.util.Objects;
 
+@Component
+@RequiredArgsConstructor
 @Slf4j
-public class ServerContext implements Context {
+public class ServerContext implements Context, InitializingBean {
 
     private static final String RUNTIME_DIR = System.getProperty("user.dir");
-    private static final String SERVER_CONF_PATH = RUNTIME_DIR + File.separator + "conf" + File.separator + "server.properties";
-    private static final String CLIENT_INFO_PATH = RUNTIME_DIR + File.separator + "conf" + File.separator + "client.json";
-    private static volatile ServerContext INSTANCE = null;
-    /**
-     * configuration info from {@link ServerContext#SERVER_CONF_PATH} file.
-     */
-    private final Properties properties = new Properties();
-    /**
-     * server conf.
-     */
-    private final ServerConfiguration configuration = ServerConfiguration.instance();
+    private static final String DEFAULT_CLIENT_INFO_PATH = RUNTIME_DIR + File.separator + "conf" + File.separator + "client.json";
+    private static final String CLIENT_INFO_PATH;
+
+    static {
+        String clientJson = System.getProperty("client.json", null);
+        CLIENT_INFO_PATH = Objects.requireNonNullElse(clientJson, DEFAULT_CLIENT_INFO_PATH);
+    }
+
     /**
      * client list.
      */
@@ -51,55 +53,12 @@ public class ServerContext implements Context {
      */
     private final Map<Integer, InetSocketAddress> proxyPortClientInetMap = Maps.newHashMap();
 
+    private final ServerConfiguration configuration;
 
-    private ServerContext() {
-        initProperties();
-        initConfiguration();
+    @Override
+    public void afterPropertiesSet() throws Exception {
         initClientInfo();
         reloadClientProxyInfo();
-    }
-
-    public static ServerContext instance() {
-        if (INSTANCE == null) {
-            synchronized (ServerContext.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new ServerContext();
-                }
-            }
-        }
-        return INSTANCE;
-    }
-
-    /**
-     * Load server configuration from {@link ServerContext#SERVER_CONF_PATH} file.
-     */
-    private void initProperties() {
-        FileInputStream confInputStream = null;
-        try {
-            confInputStream = new FileInputStream(SERVER_CONF_PATH);
-            properties.load(confInputStream);
-        } catch (FileNotFoundException e) {
-            log.error("server conf not found.");
-        } catch (IOException e) {
-            log.error("server conf load failure. {}", e.getMessage());
-        } finally {
-            if (confInputStream != null) {
-                try {
-                    confInputStream.close();
-                } catch (IOException e) {
-                    log.error("server conf close failure. {}", e.getMessage());
-                }
-            }
-        }
-    }
-
-    /**
-     * Convert properties to configuration class.
-     */
-    private void initConfiguration() {
-        if (configuration == null) throw new RuntimeException();
-        configuration.setServerHost(properties.getProperty("server.host", "127.0.0.1"));
-        configuration.setServerPort(Integer.valueOf(properties.getProperty("server.port", "10081")));
     }
 
     /**
@@ -174,8 +133,7 @@ public class ServerContext implements Context {
     }
 
     public boolean auth(String clientId) {
-        if (StringUtil.isNullOrEmpty(clientId))
-            return false;
+        if (StringUtil.isNullOrEmpty(clientId)) return false;
         for (Client client : clientList) {
             if (clientId.contains(client.getId())) {
                 return true;
