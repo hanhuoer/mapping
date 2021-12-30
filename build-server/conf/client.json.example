@@ -1,0 +1,49 @@
+[
+// eg:
+// server ip: 192.168.50.131
+// client ip: 192.168.50.132
+// 192.168.50.131:29001 -> 192.168.50.132:19001
+// 192.168.50.131:29000 -> 192.168.50.132.19000
+  {
+    "id": "e8da60c4-9a77-bf0b-f28c-354fd473dfee",
+    "name": "pc",
+    "proxyList": [
+      {
+        "name": "server1",
+        "serverPort": 29001,
+        "clientPort": 19001,
+        "clientHost": "127.0.0.1"
+      },
+      {
+        "name": "server2",
+        "serverPort": 29000,
+        "clientPort": 19000,
+        "clientHost": "127.0.0.1"
+      }
+    ]
+  },
+
+// eg:
+// server ip: 192.168.50.131
+// client ip: 192.168.50.132
+// 192.168.50.131:13000 -> 192.168.50.132:3000
+// 192.168.50.131:16379 -> 192.168.50.132.6379
+  {
+    "id": "c9b324b2-6de4-eade-f54f-32ed600d0af6",
+    "name": "home",
+    "proxyList": [
+      {
+        "name": "mysql",
+        "serverPort": 13000,
+        "clientPort": 3000,
+        "clientHost": "127.0.0.1"
+      },
+      {
+        "name": "redis",
+        "serverPort": 16379,
+        "clientPort": 6379,
+        "clientHost": "127.0.0.1"
+      }
+    ]
+  }
+]
