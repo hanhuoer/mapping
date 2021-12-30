@@ -34,6 +34,7 @@ export BASE_DIR=`cd $(dirname $0)/..; pwd`
 #===========================================================================================
 
 JAVA_OPT="${JAVA_OPT} -Xms512m -Xmx512m -Xmn256m"
+JAVA_OPT="${JAVA_OPT} -Dmapping.home=${BASE_DIR}"
 JAVA_OPT="${JAVA_OPT} -jar ${BASE_DIR}/target/${CLIENT}.jar"
 JAVA_OPT="${JAVA_OPT} ${JAVA_OPT_EXT}"
 

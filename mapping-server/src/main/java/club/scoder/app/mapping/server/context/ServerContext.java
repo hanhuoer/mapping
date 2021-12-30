@@ -25,11 +25,16 @@ import java.util.Objects;
 @Slf4j
 public class ServerContext implements Context, InitializingBean {
 
-    private static final String RUNTIME_DIR = System.getProperty("user.dir");
-    private static final String DEFAULT_CLIENT_INFO_PATH = RUNTIME_DIR + File.separator + "conf" + File.separator + "client.json";
+    private static final String RUNTIME_DIR;
+    private static final String DEFAULT_CLIENT_INFO_PATH;
     private static final String CLIENT_INFO_PATH;
 
     static {
+        String mappingHome = System.getProperty("mapping.home");
+        String userDir = System.getProperty("user.dir");
+        RUNTIME_DIR = Objects.requireNonNullElse(mappingHome, userDir);
+        DEFAULT_CLIENT_INFO_PATH = RUNTIME_DIR + File.separator + "conf" + File.separator + "client.json";
+
         String clientJson = System.getProperty("client.json", null);
         CLIENT_INFO_PATH = Objects.requireNonNullElse(clientJson, DEFAULT_CLIENT_INFO_PATH);
     }

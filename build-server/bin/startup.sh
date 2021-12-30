@@ -34,7 +34,10 @@ export BASE_DIR=`cd $(dirname $0)/..; pwd`
 #===========================================================================================
 
 JAVA_OPT="${JAVA_OPT} -Xms512m -Xmx512m -Xmn256m"
+JAVA_OPT="${JAVA_OPT} -Dmapping.home=${BASE_DIR}"
+JAVA_OPT="${JAVA_OPT} -Dclient.json=${BASE_DIR}/conf/client.json"
 JAVA_OPT="${JAVA_OPT} -jar ${BASE_DIR}/target/${SERVER}.jar"
+JAVA_OPT="${JAVA_OPT} --spring.config.additional-location=${BASE_DIR}/conf/"
 JAVA_OPT="${JAVA_OPT} ${JAVA_OPT_EXT}"
 
 if [ ! -d "${BASE_DIR}/logs" ]; then
