@@ -23,6 +23,10 @@
 
     <files>
         <file>
+            <source>../LICENSE</source>
+            <destName>LICENSE</destName>
+        </file>
+        <file>
             <!--打好的jar包名称和放置目录-->
             <source>../mapping-server/target/mapping-server.jar</source>
             <outputDirectory>target/</outputDirectory>
