@@ -36,7 +36,7 @@
                 </dependency>
             </dependencies>
             <build>
-                <finalName>client</finalName>
+                <finalName>mapping</finalName>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
