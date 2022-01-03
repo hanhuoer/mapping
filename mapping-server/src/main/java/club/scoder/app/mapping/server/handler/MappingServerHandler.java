@@ -38,6 +38,7 @@ public class MappingServerHandler extends SimpleChannelInboundHandler<Message> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error("exception occurred: {}", cause.getMessage());
         ctx.close();
         String channelId = getChannelId(ctx);
         String clientId = ChannelManager.channelIdClientIdMap.get(channelId);

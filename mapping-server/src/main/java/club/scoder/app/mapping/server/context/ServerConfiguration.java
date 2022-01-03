@@ -22,6 +22,11 @@ public class ServerConfiguration implements Serializable, InitializingBean {
     private String serverName;
     private String serverHost;
     private Integer serverPort;
+    private Boolean sslEnable = false;
+    private String sslJksPath;
+    private String sslKeyStorePassword;
+    private String sslKeyManagerPassword;
+    private Boolean sslNeedsClientAuth = false;
 
 
     @Override

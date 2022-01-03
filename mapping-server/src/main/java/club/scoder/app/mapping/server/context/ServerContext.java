@@ -10,12 +10,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.security.*;
+import java.security.cert.CertificateException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -60,10 +67,66 @@ public class ServerContext implements Context, InitializingBean {
 
     private final ServerConfiguration configuration;
 
+    private SSLContext sslContext;
+
     @Override
     public void afterPropertiesSet() throws Exception {
         initClientInfo();
         reloadClientProxyInfo();
+        initSSLContext();
+    }
+
+    private void initSSLContext() {
+        if (!configuration.getSslEnable()) {
+            log.info("ssl is not enable.");
+        } else {
+            log.info("ssl is enable.");
+            String sslJksPath = configuration.getSslJksPath();
+            log.info("initializing ssl context, jks path: {}", sslJksPath);
+            if (!StringUtils.hasLength(sslJksPath)) {
+                log.warn("the jks path is null or empty.");
+                return;
+            }
+            String sslJksFilePath = RUNTIME_DIR + File.separator + sslJksPath;
+            log.info("jks file path: {}", sslJksFilePath);
+
+            // password
+            String sslKeyStorePassword = configuration.getSslKeyStorePassword();
+            if (!StringUtils.hasText(sslKeyStorePassword)) {
+                log.info("key store password can not be null.");
+                return;
+            }
+            String sslKeyManagerPassword = configuration.getSslKeyManagerPassword();
+            if (!StringUtils.hasText(sslKeyStorePassword)) {
+                log.info("the key store password can not be null.");
+                return;
+            }
+
+            try {
+                FileInputStream fileInputStream = new FileInputStream(sslJksFilePath);
+                SSLContext serverSSLContext = SSLContext.getInstance("TLSv1");
+                KeyStore keyStore = KeyStore.getInstance("JKS");
+                keyStore.load(fileInputStream, sslKeyStorePassword.toCharArray());
+
+                KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+                keyManagerFactory.init(keyStore, sslKeyManagerPassword.toCharArray());
+
+                // auth
+                TrustManager[] trustManagers = null;
+                if (configuration.getSslNeedsClientAuth()) {
+                    TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                    trustManagerFactory.init(keyStore);
+                    trustManagers = trustManagerFactory.getTrustManagers();
+                }
+
+                serverSSLContext.init(keyManagerFactory.getKeyManagers(), trustManagers, null);
+                sslContext = serverSSLContext;
+                log.info("ssl initialized successfully.");
+            } catch (NoSuchAlgorithmException | KeyStoreException | CertificateException | IOException
+                    | KeyManagementException | UnrecoverableKeyException e) {
+                log.error("initialization failed; cause: {}, message: {}", e.getCause(), e.getMessage());
+            }
+        }
     }
 
     /**
@@ -135,6 +198,10 @@ public class ServerContext implements Context, InitializingBean {
 
     public List<Integer> getProxyPortList() {
         return proxyPortList;
+    }
+
+    public SSLContext getSslContext() {
+        return sslContext;
     }
 
     public boolean auth(String clientId) {

@@ -15,8 +15,11 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.ssl.SslHandler;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
@@ -29,9 +32,11 @@ public class MappingClient implements Server {
     private final Bootstrap bootstrap;
     private final EventLoopGroup workGroup;
     private final Retry retry;
+    private ClientContext clientContext;
 
 
     public MappingClient(ClientContext clientContext) {
+        this.clientContext = clientContext;
         ClientConfiguration configuration = clientContext.getConfiguration();
         clientId = configuration.getClientId();
         serverHost = configuration.getServerHost();
@@ -44,6 +49,12 @@ public class MappingClient implements Server {
         bootstrap.group(workGroup).channel(NioSocketChannel.class).option(ChannelOption.SO_KEEPALIVE, true).handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
+                SSLContext sslContext = clientContext.getSslContext();
+                if (sslContext != null) {
+                    SSLEngine sslEngine = sslContext.createSSLEngine();
+                    sslEngine.setUseClientMode(true);
+                    ch.pipeline().addLast(new SslHandler(sslEngine));
+                }
                 ch.pipeline().addLast(new MessageDecoder());
                 ch.pipeline().addLast(new MessageEncoder());
                 ch.pipeline().addLast(new IdleClientHandler());

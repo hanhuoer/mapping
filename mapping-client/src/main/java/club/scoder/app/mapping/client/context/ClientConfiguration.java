@@ -16,6 +16,9 @@ public class ClientConfiguration implements InitializingBean {
     private String clientId;
     private String serverHost;
     private Integer serverPort;
+    private Boolean sslEnable = false;
+    private String sslJksPath;
+    private String sslKeyStorePassword;
 
 
     @Override

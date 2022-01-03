@@ -15,8 +15,11 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.ssl.SslHandler;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import java.net.InetSocketAddress;
 
 @Slf4j
@@ -27,13 +30,14 @@ public class MappingServer implements Server {
     private final String hostname;
     private final int port;
     private final ServerContext serverContext;
+    private final ServerConfiguration serverConfiguration;
 
 
     public MappingServer(ServerContext serverContext) {
         this.serverContext = serverContext;
-        ServerConfiguration configuration = serverContext.getConfiguration();
-        hostname = configuration.getServerHost();
-        port = configuration.getServerPort();
+        serverConfiguration = serverContext.getConfiguration();
+        hostname = serverConfiguration.getServerHost();
+        port = serverConfiguration.getServerPort();
         BOSS_GROUP = new NioEventLoopGroup(1);
         WORK_GROUP = new NioEventLoopGroup(32);
     }
@@ -47,6 +51,14 @@ public class MappingServer implements Server {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline pipeline = ch.pipeline();
+                        SSLContext sslContext = serverContext.getSslContext();
+                        if (sslContext != null) {
+                            SSLEngine sslEngine = sslContext.createSSLEngine();
+                            sslEngine.setUseClientMode(false);
+//                            sslEngine.setNeedClientAuth(serverConfiguration.getSslNeedsClientAuth());
+                            sslEngine.setNeedClientAuth(false);
+                            pipeline.addLast("ssl", new SslHandler(sslEngine));
+                        }
                         pipeline.addLast(new MessageDecoder())
                                 .addLast(new MessageEncoder())
                                 .addLast(new IdleServerHandler())
