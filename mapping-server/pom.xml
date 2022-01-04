@@ -32,19 +32,6 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>*.yml</exclude>
-                    <exclude>*.properties</exclude>
-                    <exclude>*.xml</exclude>
-                </excludes>
-            </resource>
-        </resources>
-    </build>
-
     <profiles>
         <profile>
             <id>release-server</id>
@@ -60,6 +47,11 @@
                                     <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                                 </manifest>
                             </archive>
+                            <excludes>
+                                <exclude>*.yml</exclude>
+                                <exclude>*.properties</exclude>
+                                <exclude>*.xml</exclude>
+                            </excludes>
                         </configuration>
                     </plugin>
                     <plugin>
