@@ -214,4 +214,19 @@ public class ServerContext implements Context, InitializingBean {
         return false;
     }
 
+    public Client getClientByProxyPort(int port) {
+        for (Client client : clientList) {
+            List<Proxy> proxyList = client.getProxyList();
+            if (proxyList != null) {
+                for (Proxy proxy : proxyList) {
+                    Integer serverPort = proxy.getServerPort();
+                    if (serverPort.equals(port)) {
+                        return client;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 }

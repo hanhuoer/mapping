@@ -2,6 +2,7 @@ package club.scoder.app.mapping.server.proxy;
 
 import club.scoder.app.mapping.common.Server;
 import club.scoder.app.mapping.server.context.ServerContext;
+import club.scoder.app.mapping.server.filter.ClientHttpRequestFilter;
 import club.scoder.app.mapping.server.handler.UserChannelHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -20,11 +21,13 @@ public class UserServer implements Server {
     private final EventLoopGroup WORK_GROUP;
     private final List<Integer> proxyPortList;
     private final ServerContext serverContext;
+    private final ClientHttpRequestFilter clientHttpRequestFilter;
 
 
-    public UserServer(ServerContext serverContext) {
+    public UserServer(ServerContext serverContext, ClientHttpRequestFilter clientHttpRequestFilter) {
         this.serverContext = serverContext;
         proxyPortList = serverContext.getProxyPortList();
+        this.clientHttpRequestFilter = clientHttpRequestFilter;
         BOSS_GROUP = new NioEventLoopGroup(1);
         WORK_GROUP = new NioEventLoopGroup(32);
     }
@@ -37,7 +40,7 @@ public class UserServer implements Server {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new UserChannelHandler(serverContext));
+                        ch.pipeline().addLast(new UserChannelHandler(serverContext, clientHttpRequestFilter));
                     }
                 });
         for (Integer port : proxyPortList) {

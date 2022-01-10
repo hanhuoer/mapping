@@ -3,7 +3,11 @@ package club.scoder.app.mapping.server.handler;
 import club.scoder.app.mapping.common.protocol.Message;
 import club.scoder.app.mapping.common.protocol.MessageType;
 import club.scoder.app.mapping.server.context.ChannelManager;
+import club.scoder.app.mapping.server.context.Client;
 import club.scoder.app.mapping.server.context.ServerContext;
+import club.scoder.app.mapping.server.filter.ClientHttpRequestFilter;
+import club.scoder.app.mapping.server.parser.HttpRequest;
+import club.scoder.app.mapping.server.parser.RowHttpRequestParser;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.Channel;
@@ -18,10 +22,12 @@ import java.nio.charset.StandardCharsets;
 public class UserChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private final ServerContext serverContext;
+    private final ClientHttpRequestFilter clientHttpRequestFilter;
 
 
-    public UserChannelHandler(ServerContext serverContext) {
+    public UserChannelHandler(ServerContext serverContext, ClientHttpRequestFilter clientHttpRequestFilter) {
         this.serverContext = serverContext;
+        this.clientHttpRequestFilter = clientHttpRequestFilter;
     }
 
     @Override
@@ -41,7 +47,6 @@ public class UserChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         ctx.close();
-        ChannelManager.userChannelMap.remove(getChannelId(ctx));
     }
 
     /**
@@ -53,13 +58,29 @@ public class UserChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-        Message message = new Message();
-        message.setType(MessageType.TRANSMISSION);
-        message.setChannelId(ctx.channel().id().asLongText().getBytes(StandardCharsets.UTF_8));
-        byte[] inetAddress = (getTargetInet(ctx).getBytes(StandardCharsets.UTF_8));
-        message.setInetAddress(inetAddress);
-        message.setData(ByteBufUtil.getBytes(msg));
-        sendToProxyChannel(message, getProxyChannel(ctx));
+        filter(ctx, msg);
+    }
+
+    private void filter(ChannelHandlerContext ctx, ByteBuf msg) {
+        HttpRequest request = RowHttpRequestParser.parse(msg);
+        if (request == null) {
+            return;
+        }
+        InetSocketAddress socketAddress = (InetSocketAddress) ctx.channel().localAddress();
+        int port = socketAddress.getPort();
+        Client client = serverContext.getClientByProxyPort(port);
+        boolean filter = clientHttpRequestFilter.filter(request, port, client);
+        if (!filter) {
+            throw new RuntimeException("filter");
+        } else {
+            Message message = new Message();
+            message.setType(MessageType.TRANSMISSION);
+            message.setChannelId(ctx.channel().id().asLongText().getBytes(StandardCharsets.UTF_8));
+            byte[] inetAddress = (getTargetInet(ctx).getBytes(StandardCharsets.UTF_8));
+            message.setInetAddress(inetAddress);
+            message.setData(ByteBufUtil.getBytes(msg));
+            sendToProxyChannel(message, getProxyChannel(ctx));
+        }
     }
 
     /**
@@ -78,7 +99,7 @@ public class UserChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
             proxyChannel.writeAndFlush(message);
             log.info("send data success; channel: {}", proxyChannel.id().asLongText());
         } else {
-            log.info("send data failed; proxy channel is not exist.");
+            log.warn("send data failed; proxy channel is not exist.");
         }
     }
 
