@@ -26,6 +26,8 @@ import java.security.cert.CertificateException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -214,6 +216,16 @@ public class ServerContext implements Context, InitializingBean {
         return false;
     }
 
+    public Client getClientById(String id) {
+        if (id == null) return null;
+        for (Client client : clientList) {
+            if (client.getId().equals(id)) {
+                return client;
+            }
+        }
+        return null;
+    }
+
     public Client getClientByProxyPort(int port) {
         for (Client client : clientList) {
             List<Proxy> proxyList = client.getProxyList();
@@ -229,4 +241,139 @@ public class ServerContext implements Context, InitializingBean {
         return null;
     }
 
+    public synchronized void addClient(Client client) {
+        if (client == null) return;
+        clientList.add(client);
+    }
+
+    public synchronized void updateClient(Client client) {
+        if (client == null) return;
+        String id = client.getId();
+        List<Client> newClientList = Lists.newArrayList();
+        for (Client originalClient : clientList) {
+            String originalId = originalClient.getId();
+            if (id.equals(originalId)) {
+                newClientList.add(client);
+            } else {
+                newClientList.add(originalClient);
+            }
+        }
+        clientList.clear();
+        clientList.addAll(newClientList);
+    }
+
+    public synchronized void deleteClient(Client client) {
+        if (client == null) return;
+        String id = client.getId();
+        clientList.removeIf(c -> c.getId().equals(id));
+    }
+
+    /**
+     * check given client.
+     * 1. the client can not be null or empty.
+     * 2. the client's id can not be null or empty.
+     * 3. the client's proxy port can not be duplicate.
+     * 4. the client's id can not be duplicate.
+     * 5. the client's proxy port can not be duplicate with others.
+     *
+     * @param checkedClient checked client
+     */
+    public void checkClientForAdd(Client checkedClient) {
+        checkClient(checkedClient, false);
+    }
+
+    /**
+     * check a given client.
+     * 1. the client can not be null or empty.
+     * 2. the client's id can not be null or empty.
+     * 3. the client's proxy port can not be duplicate.
+     * 4. the client must be existed.
+     * 5. the client's proxy port can not be duplicate with others.
+     *
+     * @param checkedClient checked client.
+     */
+    public void checkClientForUpdate(Client checkedClient) {
+        checkClient(checkedClient, true);
+    }
+
+    private synchronized void checkClient(Client checkedClient, boolean isUpdate) {
+        if (checkedClient == null) {
+            throw new RuntimeException("client configuration must not be null or empty.");
+        }
+        if (!StringUtils.hasText(checkedClient.getId())) {
+            throw new RuntimeException("client id must not be null or empty.");
+        }
+
+        List<Proxy> checkedProxyList = checkedClient.getProxyList();
+        if (CollectionUtils.isEmpty(checkedProxyList)) {
+            return;
+        }
+        // check server port and inet.
+        for (Proxy proxy : checkedProxyList) {
+            if (proxy.getServerPort() == null) {
+                throw new RuntimeException("server port must not be null.");
+            }
+            if (!StringUtils.hasText(proxy.getClientHost())) {
+                throw new RuntimeException("client host must not be null.");
+            }
+            if (proxy.getClientPort() == null) {
+                throw new RuntimeException("client port must not be null.");
+            }
+        }
+
+        // check duplicate.
+        List<Integer> checkedServerPortList = checkedProxyList.stream()
+                .map(Proxy::getServerPort)
+                .collect(Collectors.toList());
+        Set<Integer> checkedServerPortSet = checkedProxyList.stream()
+                .map(Proxy::getServerPort)
+                .collect(Collectors.toSet());
+        if (checkedServerPortList.size() != checkedServerPortSet.size()) {
+            throw new RuntimeException("client port must be unique.");
+        }
+
+        if (CollectionUtils.isEmpty(clientList)) {
+            return;
+        }
+
+        // check if client exist.
+        String id = checkedClient.getId();
+        if (isUpdate) {
+            // check for update.
+            Client originalClient = this.clientList.stream()
+                    .filter(o -> id.equals(o.getId()))
+                    .findFirst()
+                    .orElse(null);
+            if (originalClient == null) {
+                throw new RuntimeException("client is not exist.");
+            }
+        }
+
+        // check server port if existed.
+        for (Client client : clientList) {
+            if (isUpdate) {
+                if (client.getId().equals(id)) {
+                    continue;
+                }
+            } else {
+                // check id. (for add)
+                if (id.equals(client.getId())) {
+                    throw new RuntimeException("client id has already in use.");
+                }
+            }
+            List<Proxy> originalProxyList = client.getProxyList();
+            if (CollectionUtils.isEmpty(originalProxyList)) {
+                continue;
+            }
+            for (Proxy proxy : originalProxyList) {
+                Integer serverPort = proxy.getServerPort();
+                if (serverPort == null) {
+                    continue;
+                }
+                if (checkedServerPortList.contains(serverPort)) {
+                    throw new RuntimeException(String.format("%s port already in use.", serverPort));
+                }
+            }
+        }
+    }
 }
