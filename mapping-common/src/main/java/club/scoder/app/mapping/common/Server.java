@@ -6,4 +6,7 @@ public interface Server {
 
     void stop();
 
+    default void refresh() {
+    }
+
 }

@@ -17,24 +17,25 @@ import java.util.List;
 @Slf4j
 public class UserServer implements Server {
 
-    private final EventLoopGroup BOSS_GROUP;
-    private final EventLoopGroup WORK_GROUP;
     private final List<Integer> proxyPortList;
     private final ServerContext serverContext;
     private final ClientHttpRequestFilter clientHttpRequestFilter;
+    private EventLoopGroup BOSS_GROUP;
+    private EventLoopGroup WORK_GROUP;
 
 
     public UserServer(ServerContext serverContext, ClientHttpRequestFilter clientHttpRequestFilter) {
         this.serverContext = serverContext;
         proxyPortList = serverContext.getProxyPortList();
         this.clientHttpRequestFilter = clientHttpRequestFilter;
-        BOSS_GROUP = new NioEventLoopGroup(1);
-        WORK_GROUP = new NioEventLoopGroup(32);
+
     }
 
     @Override
     public void start() {
         ServerBootstrap serverBootstrap = new ServerBootstrap();
+        BOSS_GROUP = new NioEventLoopGroup(1);
+        WORK_GROUP = new NioEventLoopGroup(32);
         serverBootstrap.group(BOSS_GROUP, WORK_GROUP)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
@@ -57,6 +58,12 @@ public class UserServer implements Server {
     public void stop() {
         BOSS_GROUP.shutdownGracefully();
         WORK_GROUP.shutdownGracefully();
+    }
+
+    @Override
+    public void refresh() {
+        stop();
+        start();
     }
 
 }

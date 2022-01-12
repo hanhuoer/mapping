@@ -20,6 +20,7 @@ public class StartServer implements InitializingBean {
         mappingServer.start();
         UserServer userServer = new UserServer(serverContext, clientHttpRequestFilter);
         userServer.start();
+        serverContext.addServer(userServer);
     }
 
 }

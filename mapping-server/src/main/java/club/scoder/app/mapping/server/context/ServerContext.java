@@ -1,6 +1,7 @@
 package club.scoder.app.mapping.server.context;
 
 import club.scoder.app.mapping.common.Context;
+import club.scoder.app.mapping.common.Server;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -71,11 +73,22 @@ public class ServerContext implements Context, InitializingBean {
 
     private SSLContext sslContext;
 
+    private List<Server> servers;
+
     @Override
     public void afterPropertiesSet() throws Exception {
         initClientInfo();
         reloadClientProxyInfo();
         initSSLContext();
+        servers = Lists.newArrayList();
+    }
+
+    @Override
+    public void refresh() {
+        reloadClientProxyInfo();
+        for (Server server : servers) {
+            server.refresh();
+        }
     }
 
     private void initSSLContext() {
@@ -239,6 +252,10 @@ public class ServerContext implements Context, InitializingBean {
             }
         }
         return null;
+    }
+
+    public void addServer(Server server) {
+        servers.add(server);
     }
 
     public synchronized void addClient(Client client) {
