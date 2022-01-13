@@ -36,9 +36,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ServerContext implements Context, InitializingBean {
 
-    private static final String RUNTIME_DIR;
-    private static final String DEFAULT_CLIENT_INFO_PATH;
-    private static final String CLIENT_INFO_PATH;
+    public static final String RUNTIME_DIR;
+    public static final String DEFAULT_CLIENT_INFO_PATH;
+    public static final String CLIENT_INFO_PATH;
 
     static {
         String mappingHome = System.getProperty("mapping.home");
@@ -201,6 +201,10 @@ public class ServerContext implements Context, InitializingBean {
 
     public ServerConfiguration getConfiguration() {
         return configuration;
+    }
+
+    public List<Client> getClientList() {
+        return clientList;
     }
 
     public String getClientIdByProxyPort(int port) {

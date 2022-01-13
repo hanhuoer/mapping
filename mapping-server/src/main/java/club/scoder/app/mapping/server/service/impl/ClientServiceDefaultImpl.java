@@ -9,6 +9,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -23,6 +29,7 @@ public class ClientServiceDefaultImpl implements IClientService {
         Client client = JSONObject.parseObject(JSONObject.toJSONString(clientVO), Client.class);
         serverContext.checkClientForAdd(client);
         serverContext.addClient(client);
+        saveToFile(serverContext.getClientList());
     }
 
     @Override
@@ -31,6 +38,7 @@ public class ClientServiceDefaultImpl implements IClientService {
         Client client = JSONObject.parseObject(JSONObject.toJSONString(clientVO), Client.class);
         serverContext.checkClientForUpdate(client);
         serverContext.updateClient(client);
+        saveToFile(serverContext.getClientList());
     }
 
     @Override
@@ -40,6 +48,36 @@ public class ClientServiceDefaultImpl implements IClientService {
             throw new RuntimeException("client is not exist.");
         }
         serverContext.deleteClient(client);
+        saveToFile(serverContext.getClientList());
+    }
+
+    /**
+     * refresh whole client's configuration to the file.
+     *
+     * @param clientList all client list
+     */
+    private void saveToFile(List<Client> clientList) {
+        saveToFile(ServerContext.CLIENT_INFO_PATH, clientList);
+    }
+
+    private void saveToFile(String filepath, List<Client> clientList) {
+        FileOutputStream fileOutputStream = null;
+        BufferedOutputStream bufferedOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(filepath);
+            bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+            bufferedOutputStream.write(JSONObject.toJSONString(clientList).getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            log.error("error saving client configuration. message: {}", e.getMessage(), e);
+        } finally {
+            if (bufferedOutputStream != null) {
+                try {
+                    bufferedOutputStream.close();
+                } catch (IOException e) {
+                    log.error("error closing the stream for the client profile. message: {}", e.getMessage(), e);
+                }
+            }
+        }
     }
 
 }
