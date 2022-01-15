@@ -1,15 +1,26 @@
 <template>
   <div class="client">
-    client page
+    client page.
+    <el-button @click="handleRefresh">refresh</el-button>
   </div>
 </template>
 
 <script>
+import {refresh} from "@/api/client"
+
 export default {
-  name: "Client"
+  name: "Client",
+  methods: {
+    handleRefresh: function () {
+      refresh().then(response => {
+        console.log(response)
+      })
+    }
+  }
 }
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+  .client {
+  }
 </style>

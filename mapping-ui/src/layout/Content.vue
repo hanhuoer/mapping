@@ -1,20 +1,22 @@
 <template>
-  <div>
-    <router-view :key="key"/>
-  </div>
+    <div class="content">
+        <router-view :key="key"/>
+    </div>
 </template>
 
 <script>
-export default {
-  name: "Content",
-  computed: {
-    key() {
-      return this.$route.path
+    export default {
+        name: "Content",
+        computed: {
+            key() {
+                return this.$route.path
+            }
+        }
     }
-  }
-}
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+    .content {
+      padding: 20px 20px;
+    }
 </style>
