@@ -9,7 +9,7 @@ public enum ErrorCode implements Code {
     /**
      * default
      */
-    CODE("50000", "failure");
+    CODE("50000", "error");
 
     private String code;
     private String message;

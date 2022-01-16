@@ -166,7 +166,7 @@ public interface Response<T> extends Serializable {
      * @return -
      */
     static <T> Response<T> error() {
-        return DefaultResponse.failure();
+        return DefaultResponse.error();
     }
 
     /**
@@ -177,11 +177,11 @@ public interface Response<T> extends Serializable {
      * @return -
      */
     static <T> Response<T> error(T data) {
-        return DefaultResponse.failure(data);
+        return DefaultResponse.error(data);
     }
 
     static <T> Response<T> error(T data, String message) {
-        return DefaultResponse.failure(data, message);
+        return DefaultResponse.error(data, message);
     }
 
     /**
@@ -193,7 +193,7 @@ public interface Response<T> extends Serializable {
      * @return -
      */
     static <T> Response<T> error(Code code, String message) {
-        return DefaultResponse.failure(code, message);
+        return DefaultResponse.error(code, message);
     }
 
     /**
@@ -205,7 +205,7 @@ public interface Response<T> extends Serializable {
      * @return -
      */
     static <T> Response<T> error(Code code, T data) {
-        return DefaultResponse.failure(code, data);
+        return DefaultResponse.error(code, data);
     }
 
     /**
@@ -218,7 +218,7 @@ public interface Response<T> extends Serializable {
      * @return -
      */
     static <T> Response<T> error(Code code, String message, T data) {
-        return DefaultResponse.failure(code, message, data);
+        return DefaultResponse.error(code, message, data);
     }
 
     /**
