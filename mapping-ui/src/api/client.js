@@ -1,8 +1,16 @@
 import request from '@/utils/request'
+import qs from 'qs';
+
+export function list() {
+    return request({
+        url: '/client/list',
+        method: 'get'
+    })
+}
 
 export function add(client) {
     return request({
-        url: '/add',
+        url: '/client/add',
         method: 'post',
         header: {
             'Content-Type': 'application/json'
@@ -13,7 +21,7 @@ export function add(client) {
 
 export function update(client) {
     return request({
-        url: '/update',
+        url: '/client/update',
         method: 'post',
         header: {
             'Content-Type': 'application/json'
@@ -23,21 +31,22 @@ export function update(client) {
 }
 
 export function remove(id) {
+    let formData = qs.stringify({
+        id: id
+    });
     return request({
-        url: '/delete',
+        url: '/client/delete',
         method: 'post',
         header: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        data: {
-            id: id
-        }
+        data: formData
     })
 }
 
 export function refresh() {
     return request({
-        url: '/refresh',
+        url: '/client/refresh',
         method: 'post'
     })
 }

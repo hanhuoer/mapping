@@ -24,7 +24,7 @@ service.interceptors.request.use(config => {
 service.interceptors.response.use(response => {
     return response.data;
 }, error => {
-    return Promise.reject(error);
+    return Promise.reject(error.response.data);
 });
 
 export default service;
