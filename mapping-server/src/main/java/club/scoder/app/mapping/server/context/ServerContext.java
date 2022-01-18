@@ -188,7 +188,12 @@ public class ServerContext implements Context, InitializingBean {
         proxyPortList.clear();
         proxyPortIdMap.clear();
         for (Client client : clientList) {
-            for (Proxy proxy : client.getProxyList()) {
+            List<Proxy> proxyList = client.getProxyList();
+            if (CollectionUtils.isEmpty(proxyList)) {
+                log.debug("[reload] ignore the current client, cause it didn't configure proxy.");
+                continue;
+            }
+            for (Proxy proxy : proxyList) {
                 // update port list.
                 proxyPortList.add(proxy.getServerPort());
                 // update proxy port id map.
