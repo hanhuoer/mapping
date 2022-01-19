@@ -4,6 +4,7 @@ import club.scoder.app.mapping.server.context.Client;
 import club.scoder.app.mapping.server.context.ServerContext;
 import club.scoder.app.mapping.server.model.vo.ClientVO;
 import club.scoder.app.mapping.server.service.IClientService;
+import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,14 @@ public class ClientServiceDefaultImpl implements IClientService {
 
     private final ServerContext serverContext;
 
+
+    @Override
+    public List<ClientVO> getClientList() {
+        List<Client> clientList = serverContext.getClientList();
+        return clientList.stream()
+                .map(c -> BeanUtil.toBean(c, ClientVO.class))
+                .collect(Collectors.toList());
+    }
 
     @Override
     public void add(ClientVO clientVO) {
