@@ -21,9 +21,11 @@
     .header {
         display: flex;
         flex-direction: row;
-        padding: 10px 20px;
+        padding: 0 20px;
         background-color: #333;
-        box-shadow: 0 0 2px 0 #333;
+        box-shadow: 0 0 10px 0 #333;
+        height: 60px;
+        align-items: center;
 
         a {
             color: burlywood;

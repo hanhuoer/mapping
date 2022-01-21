@@ -17,6 +17,7 @@
 
 <style lang="scss" scoped>
     .content {
-      padding: 20px 20px;
+        padding: 20px 20px;
+        overflow: auto;
     }
 </style>
