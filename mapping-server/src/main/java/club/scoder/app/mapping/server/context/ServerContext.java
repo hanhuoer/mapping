@@ -2,6 +2,7 @@ package club.scoder.app.mapping.server.context;
 
 import club.scoder.app.mapping.common.Context;
 import club.scoder.app.mapping.common.Server;
+import club.scoder.app.mapping.common.monitor.ByteTrafficHandler;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
@@ -75,12 +76,15 @@ public class ServerContext implements Context, InitializingBean {
 
     private List<Server> servers;
 
+    private ByteTrafficHandler byteTrafficHandler;
+
     @Override
     public void afterPropertiesSet() throws Exception {
         initClientInfo();
         reloadClientProxyInfo();
         initSSLContext();
         servers = Lists.newArrayList();
+        byteTrafficHandler = new ByteTrafficHandler();
     }
 
     @Override
@@ -202,6 +206,10 @@ public class ServerContext implements Context, InitializingBean {
                 proxyPortClientInetMap.put(proxy.getServerPort(), new InetSocketAddress(proxy.getClientHost(), proxy.getClientPort()));
             }
         }
+    }
+
+    public ByteTrafficHandler getByteTrafficHandler() {
+        return byteTrafficHandler;
     }
 
     public ServerConfiguration getConfiguration() {
