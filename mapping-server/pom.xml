@@ -60,7 +60,7 @@
                             </archive>
                             <excludes>
                                 <exclude>*.yml</exclude>
-                                <exclude>*.properties</exclude>
+<!--                                <exclude>*.properties</exclude>-->
                                 <exclude>*.xml</exclude>
                             </excludes>
                         </configuration>

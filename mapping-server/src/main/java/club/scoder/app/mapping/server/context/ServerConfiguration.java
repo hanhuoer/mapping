@@ -20,8 +20,10 @@ public class ServerConfiguration implements Serializable, InitializingBean {
     private static final int DEFAULT_SERVER_PORT = 10081;
 
     private String serverName;
+    private String version;
     private String serverHost;
     private Integer serverPort;
+    private Integer webPort;
     private Boolean sslEnable = false;
     private String sslJksPath;
     private String sslKeyStorePassword;

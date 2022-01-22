@@ -27,7 +27,9 @@ public class TrafficHandler extends ChannelDuplexHandler {
         InetSocketAddress inetSocketAddress = (InetSocketAddress) channel.localAddress();
         int port = inetSocketAddress.getPort();
         Traffic traffic = byteTrafficHandler.get(port);
-        log.debug("traffic active: {}", traffic);
+        if (log.isDebugEnabled()) {
+            log.debug("traffic active: {}", traffic);
+        }
         super.channelActive(ctx);
     }
 
@@ -38,7 +40,9 @@ public class TrafficHandler extends ChannelDuplexHandler {
         Traffic traffic = byteTrafficHandler.get(port);
         byteTrafficHandler.addIn(port, size);
         byteTrafficHandler.increaseIn(port);
-        log.debug("traffic in: {}", traffic);
+        if (log.isDebugEnabled()) {
+            log.debug("traffic in: {}", traffic);
+        }
         super.channelRead(ctx, msg);
     }
 
@@ -49,7 +53,9 @@ public class TrafficHandler extends ChannelDuplexHandler {
         Traffic traffic = byteTrafficHandler.get(port);
         byteTrafficHandler.addOut(port, size);
         byteTrafficHandler.increaseOut(port);
-        log.debug("traffic out: {}", traffic);
+        if (log.isDebugEnabled()) {
+            log.debug("traffic out: {}", traffic);
+        }
         super.write(ctx, msg, promise);
     }
 

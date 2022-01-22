@@ -2,6 +2,7 @@ package club.scoder.app.mapping.common.monitor;
 
 import org.springframework.util.CollectionUtils;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -55,6 +56,10 @@ public class ByteTrafficHandler {
     public void increaseOut(int port, long delta) {
         Traffic traffic = get(port);
         traffic.getOutTimes().addAndGet(delta);
+    }
+
+    public Map<Integer, Traffic> getTrafficMap() {
+        return concurrentPortTrafficMap;
     }
 
 }

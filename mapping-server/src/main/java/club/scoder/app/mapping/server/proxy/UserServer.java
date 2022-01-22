@@ -3,6 +3,7 @@ package club.scoder.app.mapping.server.proxy;
 import club.scoder.app.mapping.common.Server;
 import club.scoder.app.mapping.server.context.ServerContext;
 import club.scoder.app.mapping.server.filter.ClientHttpRequestFilter;
+import club.scoder.app.mapping.server.handler.TrafficHandler;
 import club.scoder.app.mapping.server.handler.UserChannelHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -41,6 +42,7 @@ public class UserServer implements Server {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
+                        ch.pipeline().addFirst(new TrafficHandler(serverContext.getByteTrafficHandler()));
                         ch.pipeline().addLast(new UserChannelHandler(serverContext, clientHttpRequestFilter));
                     }
                 });

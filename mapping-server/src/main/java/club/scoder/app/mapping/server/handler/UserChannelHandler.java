@@ -33,12 +33,16 @@ public class UserChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         ChannelManager.userChannelMap.put(getChannelId(ctx), ctx.channel());
+        int userPort = getUserPort(ctx);
+        String channelId = getChannelId(ctx);
+        ChannelManager.proxyPortUserChannelIdMap.put(userPort, channelId);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         // user channel is closed.
         ChannelManager.userChannelMap.remove(getChannelId(ctx));
+        ChannelManager.proxyPortUserChannelIdMap.remove(getUserPort(ctx));
         Message message = new Message();
         message.setType(MessageType.DISCONNECTION);
         sendToProxyChannel(message, getProxyChannel(ctx));
@@ -61,7 +65,7 @@ public class UserChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
         filter(ctx, msg);
     }
 
-    private void filter(ChannelHandlerContext ctx, ByteBuf msg) {
+    private void filter(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         HttpRequest request = RowHttpRequestParser.parse(msg);
         if (request == null) {
             return;
@@ -79,7 +83,11 @@ public class UserChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
             byte[] inetAddress = (getTargetInet(ctx).getBytes(StandardCharsets.UTF_8));
             message.setInetAddress(inetAddress);
             message.setData(ByteBufUtil.getBytes(msg));
-            sendToProxyChannel(message, getProxyChannel(ctx));
+            Channel proxyChannel = getProxyChannel(ctx);
+            if (proxyChannel == null) {
+                ctx.close();
+            }
+            sendToProxyChannel(message, proxyChannel);
         }
     }
 
