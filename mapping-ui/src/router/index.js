@@ -29,6 +29,10 @@ export const constantRoutes = [
             {
                 path: '/client',
                 component: () => import('@/views/Client')
+            },
+            {
+                path: '/overview',
+                component: () => import('@/views/Overview')
             }
         ]
     }

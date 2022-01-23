@@ -12,6 +12,10 @@
                  @select="handleSelect" background-color="#333"
                  class="el-menu-vertical-demo menu-body" default-active="1-4-1" text-color="#ffffff"
                  :collapse="isCollapse">
+            <el-menu-item index="/overview">
+                <i class="el-icon-view"></i>
+                <span slot="title">Overview</span>
+            </el-menu-item>
             <el-menu-item index="/client">
                 <i class="el-icon-user"></i>
                 <span slot="title">Client</span>
