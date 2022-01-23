@@ -18,6 +18,7 @@ public class ServerConfiguration implements Serializable, InitializingBean {
 
     private static final String DEFAULT_SERVER_HOST = "127.0.0.1";
     private static final int DEFAULT_SERVER_PORT = 10081;
+    private static final int DEFAULT_WEB_PORT = 10080;
 
     private String serverName;
     private String version;
@@ -40,6 +41,10 @@ public class ServerConfiguration implements Serializable, InitializingBean {
         if (serverPort == null) {
             serverPort = DEFAULT_SERVER_PORT;
             log.info("use the default server port: {}.", DEFAULT_SERVER_PORT);
+        }
+        if (webPort == null) {
+            webPort = DEFAULT_WEB_PORT;
+            log.info("use the default web port: {}.", DEFAULT_WEB_PORT);
         }
     }
 
