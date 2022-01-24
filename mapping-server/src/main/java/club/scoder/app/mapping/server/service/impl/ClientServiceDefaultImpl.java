@@ -6,6 +6,7 @@ import club.scoder.app.mapping.server.model.vo.ClientVO;
 import club.scoder.app.mapping.server.service.IClientService;
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -76,7 +77,10 @@ public class ClientServiceDefaultImpl implements IClientService {
         try {
             fileOutputStream = new FileOutputStream(filepath);
             bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
-            bufferedOutputStream.write(JSONObject.toJSONString(clientList).getBytes(StandardCharsets.UTF_8));
+            ObjectMapper objectMapper = new ObjectMapper();
+            String clientListJsonString = objectMapper.writerWithDefaultPrettyPrinter()
+                    .writeValueAsString(clientList);
+            bufferedOutputStream.write(clientListJsonString.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             log.error("error saving client configuration. message: {}", e.getMessage(), e);
         } finally {
