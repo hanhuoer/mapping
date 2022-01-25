@@ -4,7 +4,7 @@ let baseURL;
 
 let env = process.env.NODE_ENV;
 if ("development" === env) {
-    baseURL = "http://127.0.0.1:18000"
+    baseURL = "http://127.0.0.1:10080"
 } else if ("production" === env) {
     baseURL = ""
 } else {
