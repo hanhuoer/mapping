@@ -47,7 +47,7 @@ public class JwtTokenAuthenticationFilter extends GenericFilterBean {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(JSON.toJSONString(Response.error(
-                    FailureCode.JWT_INVALID_TOKEN, "Invalid token.")));
+                    FailureCode.JWT_INVALID_TOKEN, "Invalid token.", "")));
             response.getWriter().flush();
             return;
         } catch (JwtExpiredAuthenticationException e) {
@@ -56,7 +56,7 @@ public class JwtTokenAuthenticationFilter extends GenericFilterBean {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(JSON.toJSONString(Response.error(
-                    FailureCode.JWT_EXPIRED_TOKEN, "Expired token.")));
+                    FailureCode.JWT_EXPIRED_TOKEN, "Expired token.", "")));
             response.getWriter().flush();
             return;
         } catch (UsernameNotFoundException e) {
@@ -65,7 +65,7 @@ public class JwtTokenAuthenticationFilter extends GenericFilterBean {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(JSON.toJSONString(Response.error(
-                    FailureCode.JWT_WRONG_TOKEN, "Wrong token.")));
+                    FailureCode.JWT_WRONG_TOKEN, "Wrong token.", "")));
             response.getWriter().flush();
             return;
         } catch (JwtAllowRefreshException e) {
@@ -74,7 +74,7 @@ public class JwtTokenAuthenticationFilter extends GenericFilterBean {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(JSON.toJSONString(Response.error(
-                    FailureCode.JWT_NOT_ALLOWED_REFRESH_TOKEN, "Not Allowed refresh.")));
+                    FailureCode.JWT_NOT_ALLOWED_REFRESH_TOKEN, "Not Allowed refresh.", "")));
             response.getWriter().flush();
             return;
         } catch (AuthenticationException e) {
@@ -83,7 +83,7 @@ public class JwtTokenAuthenticationFilter extends GenericFilterBean {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(JSON.toJSONString(Response.error(
-                    FailureCode.JWT_UNAUTHORIZED_TOKEN, "Unauthorized token.")));
+                    FailureCode.JWT_UNAUTHORIZED_TOKEN, "Unauthorized token.", "")));
             response.getWriter().flush();
             return;
         } catch (Exception e) {
@@ -92,7 +92,7 @@ public class JwtTokenAuthenticationFilter extends GenericFilterBean {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(JSON.toJSONString(Response.error(
-                    ErrorCode.CODE, "Internal server error.")));
+                    ErrorCode.CODE, "Internal server error.", "")));
             response.getWriter().flush();
             return;
         }
