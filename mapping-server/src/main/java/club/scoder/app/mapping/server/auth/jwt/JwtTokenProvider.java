@@ -1,5 +1,6 @@
 package club.scoder.app.mapping.server.auth.jwt;
 
+import club.scoder.app.mapping.server.context.ServerConfiguration;
 import club.scoder.app.mapping.server.service.UserDetailService;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -22,18 +23,19 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private final UserDetailService userDetailService;
+    private final ServerConfiguration configuration;
 
-    @Value("${jwt.secret-key}")
     private String secretKey;
-    @Value("${jwt.expire-seconds}")
     private Long expireSeconds;
-    @Value("${jwt.refresh-less-seconds}")
     private Long refreshLessSeconds;
 
 
     @PostConstruct
     protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+        ServerConfiguration.Jwt jwt = configuration.getJwt();
+        secretKey = Base64.getEncoder().encodeToString(jwt.getSecretKey().getBytes());
+        expireSeconds = jwt.getExpireSeconds();
+        refreshLessSeconds = jwt.getRefreshLeastSeconds();
     }
 
     public String generate(String username) {
