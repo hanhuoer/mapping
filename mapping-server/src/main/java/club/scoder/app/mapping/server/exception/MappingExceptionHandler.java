@@ -4,6 +4,7 @@ import club.scoder.app.mapping.common.http.Response;
 import club.scoder.app.mapping.common.http.code.FailureCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -28,6 +29,13 @@ public class MappingExceptionHandler {
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     private Object handleRuntimeException(RuntimeException e) {
         return Response.failure(FailureCode.FAILURE, e.getMessage());
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(code = HttpStatus.OK)
+    private Response<Object> handleBadCredentialsException(BadCredentialsException e) {
+        return Response.failure(FailureCode.USERNAME_OR_PASSWORD_WRONG,
+                "This username may be incorrect. Make sure you typed it correctly.");
     }
 
 }

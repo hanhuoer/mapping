@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("auth")
 @RequestMapping("/auth/")
 @RequiredArgsConstructor
+
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -23,7 +24,7 @@ public class AuthController {
     public Response<Object> signIn(String username, String password) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         String token = jwtTokenProvider.generate(username);
-        return Response.success(token);
+        return Response.success("Bearer " + token);
     }
 
     @PostMapping("refresh")

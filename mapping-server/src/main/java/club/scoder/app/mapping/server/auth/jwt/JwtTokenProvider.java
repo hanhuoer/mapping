@@ -79,7 +79,8 @@ public class JwtTokenProvider {
     }
 
     public String getToken(HttpServletRequest request) {
-        String authorization = request.getHeader("Authorization");
+        String authorization = request.getHeader("Authorization" +
+                "");
         return getToken(authorization);
     }
 
