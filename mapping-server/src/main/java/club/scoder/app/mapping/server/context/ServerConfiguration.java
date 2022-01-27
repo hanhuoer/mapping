@@ -17,8 +17,8 @@ public class ServerConfiguration implements Serializable, InitializingBean {
     private static final long serialVersionUID = 4714080073576164473L;
 
     private static final String DEFAULT_SERVER_HOST = "127.0.0.1";
-    private static final int DEFAULT_SERVER_PORT = 10081;
-    private static final int DEFAULT_WEB_PORT = 10080;
+    private static final int DEFAULT_SERVER_PORT = 18001;
+    private static final int DEFAULT_WEB_PORT = 18000;
 
     private String serverName;
     private String version;
