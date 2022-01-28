@@ -1,4 +1,7 @@
-import axios from "axios"
+import axios from "axios";
+import {Message} from 'element-ui';
+import router from '../router';
+import {getToken, removeToken} from "./auth";
 
 let baseURL;
 
@@ -16,6 +19,7 @@ const service = axios.create({
 });
 
 service.interceptors.request.use(config => {
+    config.headers['Authorization'] = getToken();
     return config;
 }, error => {
     return Promise.reject(error);
@@ -24,7 +28,30 @@ service.interceptors.request.use(config => {
 service.interceptors.response.use(response => {
     return response.data;
 }, error => {
-    return Promise.reject(error.response.data);
+    try {
+        let status = error.response.status;
+        if (status >= 200 && status < 500) {
+            let code = error.response.data.code;
+            if (code === "40001"
+                || code === "40002"
+                || code === "40003"
+                || code === "40004"
+                || code === "40005"
+                || code === "40006"
+            ) {
+                Message.warning("login");
+                removeToken();
+                router.push("/login");
+            } else {
+                return Promise.reject(error.response.data);
+            }
+        } else {
+            return Promise.reject(error.response.data);
+        }
+    } catch (e) {
+        Message.error(e || "Has error");
+        return Promise.reject(error.response.data);
+    }
 });
 
 export default service;
