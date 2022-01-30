@@ -29,8 +29,21 @@
         name: "Menu",
         data() {
             return {
-                isCollapse: false
+                isCollapse: false,
+                screenWidth: document.documentElement.clientWidth
             };
+        },
+        created() {
+            this.adaptScreenSize();
+        },
+        mounted() {
+            this.getScreenWidth();
+        },
+        watch: {
+            screenWidth(val) {
+                this.log.debug(val);
+                this.adaptScreenSize();
+            }
         },
         methods: {
             handleOpen(key, keyPath) {
@@ -39,6 +52,17 @@
             },
             handleSelect(key, keyPath) {
                 this.$router.push(key);
+            },
+            getScreenWidth: function () {
+                const _this = this;
+                window.onresize = () => {
+                    return (() => {
+                        _this.screenWidth = document.documentElement.clientWidth;
+                    })()
+                };
+            },
+            adaptScreenSize: function () {
+                this.isCollapse = this.screenWidth < 768;
             }
         }
     }
