@@ -2,13 +2,11 @@ package club.scoder.app.mapping.server.controller;
 
 import club.scoder.app.mapping.common.http.Response;
 import club.scoder.app.mapping.server.auth.jwt.JwtTokenProvider;
+import club.scoder.app.mapping.server.context.ServerConfiguration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController("auth")
 @RequestMapping("/auth/")
@@ -18,6 +16,7 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ServerConfiguration configuration;
 
 
     @PostMapping("sign/in")
@@ -31,7 +30,20 @@ public class AuthController {
     public Response<Object> refresh(@RequestHeader("Authorization") String authorization) {
         String token = jwtTokenProvider.getToken(authorization);
         String refresh = jwtTokenProvider.refresh(token);
-        return Response.success(refresh);
+        return Response.success("Bearer " + refresh);
+    }
+
+    @GetMapping("get/refresh/least/seconds")
+    public Response<Long> getRefreshLeastSeconds() {
+        Long result = configuration.getJwt().getRefreshLeastSeconds();
+        return Response.success(result);
+    }
+
+    @GetMapping("get/expire/at")
+    public Response<Long> getExpireAt(@RequestHeader("Authorization") String authorization) {
+        String token = jwtTokenProvider.getToken(authorization);
+        long result = jwtTokenProvider.getExpireAt(token);
+        return Response.success(result);
     }
 
 }

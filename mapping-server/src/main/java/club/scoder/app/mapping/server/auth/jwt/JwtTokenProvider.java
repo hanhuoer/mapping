@@ -5,7 +5,6 @@ import club.scoder.app.mapping.server.service.UserDetailService;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -120,6 +119,12 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String username) {
         UserDetails userDetails = userDetailService.loadUserByUsername(username);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
+    public long getExpireAt(String token) {
+        Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+        Date expiration = claimsJws.getBody().getExpiration();
+        return expiration.getTime();
     }
 
 }
