@@ -15,7 +15,7 @@
                               v-model="formData.password"></el-input>
                 </el-form-item>
                 <el-button @click="handleLogin('ruleForm')" style="width: 100%"
-                           type="primary">Log in
+                           type="primary">Sign in
                 </el-button>
             </el-form>
         </div>

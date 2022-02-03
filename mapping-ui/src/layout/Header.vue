@@ -4,15 +4,25 @@
             <router-link to="/">Mapping</router-link>
         </div>
         <div class="nav-btn-container">
-            <router-link class="nav-btn" to="/">Home</router-link>
-            <router-link class="nav-btn" to="/client">Client</router-link>
-            <router-link class="nav-btn" to="/about">About</router-link>
+            <!--<router-link class="nav-btn" to="/">Home</router-link>-->
+            <!--<router-link class="nav-btn" to="/client">Client</router-link>-->
+            <!--<router-link class="nav-btn" to="/about">About</router-link>-->
+        </div>
+        <div class="nav-user-container">
+            <el-dropdown trigger="click">
+                <span class="el-dropdown-link nav-user-avatar">
+                    <i class="nav-btn el-icon-user"></i>
+                </span>
+                <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item @click.native="handleSignOut">Sign out</el-dropdown-item>
+                </el-dropdown-menu>
+            </el-dropdown>
         </div>
     </div>
 </template>
 
 <script>
-    import {getToken, setToken} from "../utils/auth";
+    import {getToken, removeToken, setToken} from "../utils/auth";
     import {getExpireAt, getRefreshLeastSeconds, refresh} from "../api/auth";
 
     export default {
@@ -111,6 +121,14 @@
                     this.serverRefreshLessSeconds = response.data;
                     this.log.debug(`minimum seconds refresh: ${response.data}`);
                 })
+            },
+            handleSignOut: function () {
+                removeToken();
+                // this.$message({
+                //     type: 'success',
+                //     message: 'success'
+                // });
+                this.$router.push("/login");
             }
         }
     }
@@ -144,6 +162,13 @@
 
         .nav-btn {
             padding: 0 10px;
+            cursor: pointer;
+        }
+
+        .nav-user-container {
+            .nav-user-avatar {
+                font-size: 20px;
+            }
         }
     }
 
