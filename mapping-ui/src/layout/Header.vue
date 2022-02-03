@@ -9,7 +9,7 @@
             <!--<router-link class="nav-btn" to="/about">About</router-link>-->
         </div>
         <div class="nav-user-container">
-            <el-dropdown trigger="click">
+            <el-dropdown size="small" trigger="click">
                 <span class="el-dropdown-link nav-user-avatar">
                     <i class="nav-btn el-icon-user"></i>
                 </span>
