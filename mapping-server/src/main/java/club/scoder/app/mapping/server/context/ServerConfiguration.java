@@ -20,12 +20,16 @@ public class ServerConfiguration implements Serializable, InitializingBean {
     private static final String DEFAULT_SERVER_HOST = "127.0.0.1";
     private static final int DEFAULT_SERVER_PORT = 18001;
     private static final int DEFAULT_WEB_PORT = 18000;
+    private static final String DEFAULT_WEB_USERNAME = "admin";
+    private static final String DEFAULT_WEB_PASSWORD = "123456";
 
     private String serverName;
     private String version;
     private String serverHost;
     private Integer serverPort;
     private Integer webPort;
+    private String webUsername;
+    private String webPassword;
     private Boolean sslEnable = false;
     private String sslJksPath;
     private String sslKeyStorePassword;
@@ -47,6 +51,14 @@ public class ServerConfiguration implements Serializable, InitializingBean {
         if (webPort == null) {
             webPort = DEFAULT_WEB_PORT;
             log.info("use the default web port: {}.", DEFAULT_WEB_PORT);
+        }
+        if (webUsername == null) {
+            webUsername = DEFAULT_WEB_USERNAME;
+            log.info("use the default web username: {}.", DEFAULT_WEB_USERNAME);
+        }
+        if (webPassword == null) {
+            webPassword = DEFAULT_WEB_PASSWORD;
+            log.info("use the default web password: {}.", DEFAULT_WEB_PASSWORD);
         }
         if (jwt == null) {
             jwt = new Jwt();

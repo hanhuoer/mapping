@@ -1,6 +1,7 @@
 package club.scoder.app.mapping.server.context;
 
 import com.google.common.collect.Maps;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.stereotype.Repository;
 
@@ -9,16 +10,20 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 public class UserRepository {
 
     private static final Map<String, User> USER_MAP = Maps.newHashMap();
+    private final ServerConfiguration serverConfiguration;
 
 
     @PostConstruct
     public void init() {
-        USER_MAP.put("admin1", User.builder()
-                .username("admin1")
-                .password(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode("123456"))
+        String username = serverConfiguration.getWebUsername();
+        String password = serverConfiguration.getWebPassword();
+        USER_MAP.put(username, User.builder()
+                .username(username)
+                .password(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
                 .build());
     }
 
